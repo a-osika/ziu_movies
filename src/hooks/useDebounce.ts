@@ -12,9 +12,6 @@ export function useDebounce<T>(value: T, delay = 300): T {
   return debouncedValue;
 }
 // Użycie w komponencie:
-
 // const [query, setQuery] = useState('');
-
 // const debouncedQuery = useDebounce(query, 300);
-
 // const { data } = useFetchMovies(page, debouncedQuery);

@@ -1,20 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-
 import axios from "axios";
-
 import { QUERY_KEYS } from "../constants/queryKeys";
 
 const RAM_BASE = "https://rickandmortyapi.com/api";
 
 interface Character {
   id: number;
-
   name: string;
-
   status: "Alive" | "Dead" | "unknown";
-
   species: string;
-
   image: string;
 }
 

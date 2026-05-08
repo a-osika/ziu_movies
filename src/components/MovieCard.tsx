@@ -1,7 +1,5 @@
 import { useState, useCallback } from "react";
-
 import { useFavorites } from "../hooks/useFavorites";
-
 import type { Movie } from "../hooks/useFetchMovies";
 
 const IMG_BASE = "https://image.tmdb.org/t/p/w500";

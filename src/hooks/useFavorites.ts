@@ -1,5 +1,4 @@
 import { useState, useCallback } from "react";
-
 import type { Movie } from "./useFetchMovies";
 
 const STORAGE_KEY = "movie-browser-favorites";

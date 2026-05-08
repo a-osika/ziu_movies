@@ -1,7 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-
 import { tmdbClient } from "../api/tmdbClient";
-
 import { QUERY_KEYS } from "../constants/queryKeys";
 
 export interface Movie {
