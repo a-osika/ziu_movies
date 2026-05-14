@@ -3,10 +3,8 @@ import { http, HttpResponse, delay } from "msw";
 const TMDB_BASE = "https://api.themoviedb.org/3";
 
 export const handlers = [
-  // Mock listy popularnych filmów
-
   http.get(`${TMDB_BASE}/movie/popular`, async ({ request }) => {
-    await delay(800); // symuluj opóźnienie sieci
+    await delay(800);
 
     const url = new URL(request.url);
 
@@ -14,54 +12,58 @@ export const handlers = [
 
     return HttpResponse.json({
       page,
-
       total_pages: 10,
 
       results: Array.from({ length: 20 }, (_, i) => ({
         id: page * 100 + i,
-        title: `Film testowy ${page}-${i + 1}`,
-        overview: "Opis testowego filmu.",
+        title: `Film ${page}-${i + 1}`,
+        overview: "Opis filmu",
         poster_path: null,
         release_date: "2024-01-01",
         vote_average: 7.5,
-        genre_ids: [28, 12],
+        genre_ids: [28],
       })),
     });
   }),
 
-  // Mock błędu autoryzacji — do testowania ErrorBanner
+  http.get(`${TMDB_BASE}/movie/:id`, async ({ params }) => {
+    await delay(500);
 
-  http.get(`${TMDB_BASE}/movie/popular`, () => {
-    return HttpResponse.json(
-      { status_message: "Invalid API key." },
-
-      { status: 401 },
-    );
+    return HttpResponse.json({
+      id: params.id,
+      title: `Film ${params.id}`,
+      overview: "Szczegóły filmu",
+      poster_path: null,
+      release_date: "2024-01-01",
+      vote_average: 8.2,
+    });
   }),
 
-  // Rick & Morty — mock dla testów jednostkowych
+  http.get(`${TMDB_BASE}/search/movie`, async ({ request }) => {
+    await delay(500);
 
-  http.get("https://rickandmortyapi.com/api/character", () => {
+    const url = new URL(request.url);
+
+    const query = url.searchParams.get("query") ?? "";
+
     return HttpResponse.json({
-      info: { count: 2, pages: 1, next: null },
+      page: 1,
 
-      results: [
-        {
-          id: 1,
-          name: "Rick Sanchez",
-          status: "Alive",
-          species: "Human",
-          image: "",
-        },
+      total_pages: 1,
 
-        {
-          id: 2,
-          name: "Morty Smith",
-          status: "Alive",
-          species: "Human",
-          image: "",
-        },
-      ],
+      results: query
+        ? [
+            {
+              id: 999,
+              title: `Wynik dla "${query}"`,
+              overview: "Mock search result",
+              poster_path: null,
+              release_date: "2024-01-01",
+              vote_average: 9.1,
+              genre_ids: [12],
+            },
+          ]
+        : [],
     });
   }),
 ];

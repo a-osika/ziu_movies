@@ -6,9 +6,10 @@ const IMG_BASE = "https://image.tmdb.org/t/p/w500";
 
 interface Props {
   movie: Movie;
+  onSelect: (id: number) => void;
 }
 
-export function MovieCard({ movie }: Props) {
+export function MovieCard({ movie, onSelect }: Props) {
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const [optimisticFav, setOptimisticFav] = useState<boolean | null>(null);
@@ -38,7 +39,7 @@ export function MovieCard({ movie }: Props) {
   }, [displayedFav, toggleFavorite, movie]);
 
   return (
-    <div className="movie-card">
+    <div className="movie-card" onClick={() => onSelect(movie.id)}>
       <img
         src={
           movie.poster_path
@@ -55,7 +56,10 @@ export function MovieCard({ movie }: Props) {
       </p>
 
       <button
-        onClick={handleToggle}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleToggle();
+        }}
         aria-label={displayedFav ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
         className={`fav-btn ${displayedFav ? "active" : ""}`}
       >
