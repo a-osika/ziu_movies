@@ -9,6 +9,13 @@ import { SkeletonCard } from "./components/SkeletonCard";
 import { ErrorBanner } from "./components/ErrorBanner";
 import { EmptyState } from "./components/EmptyState";
 
+import { motion } from "framer-motion";
+import { useFavorites } from "./hooks/useFavorites";
+
+import { FavoritesList } from "./components/FavoritesList";
+
+import { ToastContainer } from "./components/ToastContainer";
+
 export default function App() {
   const [page, setPage] = useState(1);
 
@@ -22,7 +29,49 @@ export default function App() {
     useFetchMovies(page, debouncedQuery);
 
   const movies = data?.results ?? [];
-  console.log(data);
+
+  const [toasts, setToasts] = useState<{ id: number; message: string }[]>([]);
+
+  const addToast = (message: string) => {
+    const id = Date.now();
+
+    setToasts((prev) => [...prev, { id, message }]);
+
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    }, 3000);
+  };
+
+  const { favorites, setFavorites } = useFavorites();
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+
+    visible: {
+      opacity: 1,
+
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: {
+      opacity: 0,
+      y: 16,
+    },
+
+    visible: {
+      opacity: 1,
+      y: 0,
+
+      transition: {
+        duration: 0.25,
+      },
+    },
+  };
 
   return (
     <main className="container">
@@ -38,12 +87,25 @@ export default function App() {
         }}
       />
 
+      {favorites.length > 0 && (
+        <>
+          <h2>⭐ Ulubione</h2>
+
+          <FavoritesList favorites={favorites} setFavorites={setFavorites} />
+        </>
+      )}
+
       {isLoading && (
-        <div className="grid">
+        <motion.div
+          className="grid"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           {Array.from({ length: 12 }).map((_, i) => (
             <SkeletonCard key={i} />
           ))}
-        </div>
+        </motion.div>
       )}
 
       {isError && (
@@ -57,15 +119,22 @@ export default function App() {
 
       {!isLoading && !isError && movies.length > 0 && (
         <>
-          <div className={`grid ${isPlaceholderData ? "loading" : ""}`}>
+          <motion.div
+            className={`grid ${isPlaceholderData ? "loading" : ""}`}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
             {movies.map((movie) => (
-              <MovieCard
-                key={movie.id}
-                movie={movie}
-                onSelect={setSelectedMovieId}
-              />
+              <motion.div key={movie.id} variants={itemVariants}>
+                <MovieCard
+                  movie={movie}
+                  onSelect={setSelectedMovieId}
+                  onToast={addToast}
+                />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           <div className="pagination">
             <button
@@ -91,6 +160,8 @@ export default function App() {
         movieId={selectedMovieId}
         onClose={() => setSelectedMovieId(null)}
       />
+
+      <ToastContainer toasts={toasts} />
     </main>
   );
 }

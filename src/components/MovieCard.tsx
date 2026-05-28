@@ -1,15 +1,17 @@
 import { useState, useCallback } from "react";
 import { useFavorites } from "../hooks/useFavorites";
 import type { Movie } from "../hooks/useFetchMovies";
+import { motion, useReducedMotion } from "framer-motion";
 
 const IMG_BASE = "https://image.tmdb.org/t/p/w500";
 
 interface Props {
   movie: Movie;
   onSelect: (id: number) => void;
+  onToast: (message: string) => void;
 }
 
-export function MovieCard({ movie, onSelect }: Props) {
+export function MovieCard({ movie, onSelect, onToast }: Props) {
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const [optimisticFav, setOptimisticFav] = useState<boolean | null>(null);
@@ -28,6 +30,8 @@ export function MovieCard({ movie, onSelect }: Props) {
 
       await toggleFavorite(movie);
 
+      onToast(displayedFav ? "Usunięto z ulubionych" : "Dodano do ulubionych");
+
       // 3. Wyczyść stan optimistic — rzeczywisty stan zsynchronizowany
 
       setOptimisticFav(null);
@@ -38,8 +42,25 @@ export function MovieCard({ movie, onSelect }: Props) {
     }
   }, [displayedFav, toggleFavorite, movie]);
 
+  const shouldReduce = useReducedMotion();
+
   return (
-    <div className="movie-card" onClick={() => onSelect(movie.id)}>
+    <motion.div
+      className="movie-card"
+      onClick={() => onSelect(movie.id)}
+      whileHover={
+        shouldReduce
+          ? {}
+          : {
+              scale: 1.03,
+              y: -2,
+            }
+      }
+      transition={{
+        duration: 0.2,
+        ease: "easeOut",
+      }}
+    >
       <img
         src={
           movie.poster_path
@@ -65,6 +86,6 @@ export function MovieCard({ movie, onSelect }: Props) {
       >
         {displayedFav ? "❤️" : "🤍"}
       </button>
-    </div>
+    </motion.div>
   );
 }

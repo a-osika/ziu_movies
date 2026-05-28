@@ -32,5 +32,10 @@ export function useFavorites() {
     [favorites],
   );
 
-  return { favorites, toggleFavorite, isFavorite };
+  return {
+  favorites,
+  setFavorites,
+  toggleFavorite,
+  isFavorite,
+};
 }
