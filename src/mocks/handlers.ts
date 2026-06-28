@@ -55,8 +55,8 @@ export const handlers = [
         ? [
             {
               id: 999,
-              title: `Wynik dla "${query}"`,
-              overview: "Mock search result",
+              title: query.charAt(0).toUpperCase() + query.slice(1),
+              overview: `To jest świetny film pod tytułem ${query}!`,
               poster_path: null,
               release_date: "2024-01-01",
               vote_average: 9.1,

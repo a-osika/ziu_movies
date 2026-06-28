@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { useFetchMovies } from "./hooks/useFetchMovies";
 import { useDebounce } from "./hooks/useDebounce";
@@ -15,6 +15,8 @@ import { useFavorites } from "./hooks/useFavorites";
 import { FavoritesList } from "./components/FavoritesList";
 
 import { ToastContainer } from "./components/ToastContainer";
+
+import { plausible } from "./analytics.ts";
 
 export default function App() {
   const [page, setPage] = useState(1);
@@ -41,6 +43,19 @@ export default function App() {
       setToasts((prev) => prev.filter((toast) => toast.id !== id));
     }, 3000);
   };
+
+  useEffect(() => {
+    if (debouncedQuery.trim() === "") return;
+
+    plausible.trackEvent("Search Movie", {
+      props: {
+        search: debouncedQuery,
+      },
+    });
+    // Zbieramy informację o wyszukiwanych tytulach
+    // Dane są potrzebne do analizy popularnosci wyszukan
+    // Nie zapisujemy danych osobowych.
+  }, [debouncedQuery]);
 
   const { favorites, setFavorites } = useFavorites();
 

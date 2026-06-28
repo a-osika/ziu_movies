@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { useFavorites } from "../hooks/useFavorites";
 import type { Movie } from "../hooks/useFetchMovies";
 import { motion, useReducedMotion } from "framer-motion";
+import { plausible } from "../analytics.ts";
 
 const IMG_BASE = "https://image.tmdb.org/t/p/w500";
 
@@ -47,7 +48,22 @@ export function MovieCard({ movie, onSelect, onToast }: Props) {
   return (
     <motion.div
       className="movie-card"
-      onClick={() => onSelect(movie.id)}
+      onClick={() => {
+        onSelect(movie.id);
+        plausible.trackEvent(
+          "Open details",
+          {
+            props: {
+              button: "open-details",
+              movie: movie.title,
+              id: movie.id,
+            },
+          },
+          // Zbieramy informację o otwartych szczegolach filmu
+          // Dane są potrzebne do analizy najchętniej otwieranych filmow
+          // Nie zapisujemy danych osobowych.
+        );
+      }}
       whileHover={
         shouldReduce
           ? {}
